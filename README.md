@@ -33,7 +33,8 @@ El sistema contempla tres roles de usuario:
    cp frontend/.env.example frontend/.env
    ```
    Ajusta `MONGODB_URI` y `JWT_SECRET` en `backend/.env` según tu entorno. Define `VITE_API_URL`
-   (por defecto `http://localhost:4000/api`).
+   (en desarrollo por defecto `http://localhost:4000/api`; en producción, si no se especifica,
+   el frontend usará `https://dise-odesistemas1.onrender.com/api`).
 3. Instalar dependencias (requiere acceso a npm):
    ```bash
    cd backend

@@ -2,6 +2,7 @@ const env = (typeof import.meta !== 'undefined' && import.meta.env) || {};
 const isBrowser = typeof window !== 'undefined';
 const isDevEnvironment = Boolean(env.DEV);
 const configuredApiUrl = env.VITE_API_URL;
+const renderApiUrl = env.VITE_RENDER_API_URL || 'https://dise-odesistemas1.onrender.com/api';
 
 function resolveDefaultApiUrl() {
   if (configuredApiUrl) {
@@ -24,7 +25,15 @@ function resolveDefaultApiUrl() {
       return `${normalizedProtocol}//localhost:${devPort}/api`;
     }
 
-    return `${normalizedProtocol}//${host}/api`;
+    if (isLocalHostname) {
+      return `${normalizedProtocol}//${host}/api`;
+    }
+
+    return renderApiUrl;
+  }
+
+  if (!isDevEnvironment) {
+    return renderApiUrl;
   }
 
   return 'http://localhost:4000/api';
