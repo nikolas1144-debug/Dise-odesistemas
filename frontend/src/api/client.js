@@ -27,6 +27,10 @@ function resolveDefaultApiUrl() {
   }
 
   if (!isDevEnvironment) {
+    if (isBrowser && window.location?.origin) {
+      return `${window.location.origin}/api`;
+    }
+
     return renderApiUrl;
   }
 
@@ -84,7 +88,10 @@ export async function apiRequest(
   if (!response.ok) {
     const errorPayload = await parseResponse(response).catch(() => ({}));
     const message =
-      (errorPayload && errorPayload.message) || response.statusText || 'Error en la solicitud';
+      (errorPayload && errorPayload.message) ||
+      (typeof errorPayload === 'string' ? errorPayload : '') ||
+      response.statusText ||
+      'Error en la solicitud';
     const error = new Error(message);
     error.status = response.status;
     error.payload = errorPayload;
