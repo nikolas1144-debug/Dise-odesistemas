@@ -37,8 +37,21 @@ function resolveDefaultApiUrl() {
   return 'http://localhost:4000/api';
 }
 
+function ensureApiPath(url) {
+  if (!url) return url;
+
+  const trimmed = url.replace(/\/+$/, '');
+  const hasApiSegment = /\/api(\/|$)/i.test(trimmed);
+
+  if (hasApiSegment) {
+    return trimmed;
+  }
+
+  return `${trimmed}/api`;
+}
+
 const rawApiUrl = resolveDefaultApiUrl();
-const API_URL = rawApiUrl.replace(/\/+$/, '');
+const API_URL = ensureApiPath(rawApiUrl);
 
 async function parseResponse(response) {
   const contentType = response.headers.get('content-type');
