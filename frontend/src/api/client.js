@@ -15,6 +15,10 @@ function resolveDefaultApiUrl() {
     const isLocalHostname =
       hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
 
+    if (!isDevEnvironment) {
+      return `${normalizedProtocol}//${host}/api`;
+    }
+
     if (isDevEnvironment) {
       const devPort = env.VITE_DEV_BACKEND_PORT || '4000';
 
@@ -24,12 +28,6 @@ function resolveDefaultApiUrl() {
 
       return `${normalizedProtocol}//localhost:${devPort}/api`;
     }
-
-    if (isLocalHostname) {
-      return `${normalizedProtocol}//${host}/api`;
-    }
-
-    return renderApiUrl;
   }
 
   if (!isDevEnvironment) {
