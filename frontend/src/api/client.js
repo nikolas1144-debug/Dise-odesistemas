@@ -9,25 +9,21 @@ function resolveDefaultApiUrl() {
     return configuredApiUrl;
   }
 
-  if (isBrowser && window.location) {
-    const { protocol, hostname, host } = window.location;
-    const normalizedProtocol = protocol === 'https:' ? 'https:' : 'http:';
-    const isLocalHostname =
-      hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+  if (isDevEnvironment) {
+    const devPort = env.VITE_DEV_BACKEND_PORT || '4000';
+    const protocol = isBrowser && window.location?.protocol === 'https:' ? 'https:' : 'http:';
 
-    if (!isDevEnvironment) {
-      return `${normalizedProtocol}//${host}/api`;
-    }
-
-    if (isDevEnvironment) {
-      const devPort = env.VITE_DEV_BACKEND_PORT || '4000';
+    if (isBrowser && window.location) {
+      const { hostname } = window.location;
+      const isLocalHostname =
+        hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
 
       if (!isLocalHostname) {
-        return `${normalizedProtocol}//${hostname}:${devPort}/api`;
+        return `${protocol}//${hostname}:${devPort}/api`;
       }
-
-      return `${normalizedProtocol}//localhost:${devPort}/api`;
     }
+
+    return `${protocol}//localhost:${devPort}/api`;
   }
 
   if (!isDevEnvironment) {
