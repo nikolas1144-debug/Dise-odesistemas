@@ -81,7 +81,6 @@ function ProductEntryPage() {
               ? 'Se registró 1 unidad sin número de serie.'
               : `Se registraron ${payload.quantity} unidades sin número de serie.`
           );
-          window.location.reload();
           return;
         }
 
@@ -136,7 +135,6 @@ function ProductEntryPage() {
             ? 'Producto registrado correctamente.'
             : `Se registraron ${serialCount} productos correctamente.`
         );
-        window.location.reload();
       } catch (error) {
         throw error;
       } finally {
