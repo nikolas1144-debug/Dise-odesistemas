@@ -45,7 +45,6 @@ function DispatchGuidesPage() {
         });
         await loadGuides();
         window.alert('Guía de despacho ingresada correctamente.');
-        window.location.reload();
       } finally {
         setUploadingGuide(false);
       }

@@ -101,7 +101,6 @@ function ProductCatalogPage() {
       setFormValues(initialFormState);
       await loadModels();
       window.alert('Categoría creada correctamente.');
-      window.location.reload();
     } catch (err) {
       setFormError(err.message || 'No se pudo registrar el modelo.');
     } finally {
