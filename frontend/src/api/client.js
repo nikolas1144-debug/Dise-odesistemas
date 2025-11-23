@@ -3,10 +3,15 @@ const isBrowser = typeof window !== 'undefined';
 const isDevEnvironment = Boolean(env.DEV);
 const configuredApiUrl = env.VITE_API_URL;
 const renderApiUrl = env.VITE_RENDER_API_URL || 'https://dise-odesistemas1.onrender.com/api';
+const useLocalBackend = env.VITE_USE_LOCAL_BACKEND === 'true';
 
 function resolveDefaultApiUrl() {
   if (configuredApiUrl) {
     return configuredApiUrl;
+  }
+
+  if (!useLocalBackend) {
+    return renderApiUrl;
   }
 
   if (isDevEnvironment) {
