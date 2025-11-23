@@ -4,9 +4,10 @@ import ProductAssignmentPanel from '../components/ProductAssignmentPanel';
 import AssignmentHistory from '../components/AssignmentHistory';
 import { useAuth } from '../hooks/useAuth';
 import { filterProductsBySearch, normalizeSearchTerm } from '../utils/search';
+import { openAssignmentActPdf } from '../utils/assignmentActPdf';
 
 function AssignmentsPage() {
-  const { request, hasRole } = useAuth();
+  const { request, hasRole, user } = useAuth();
   const [products, setProducts] = useState([]);
   const [productsError, setProductsError] = useState('');
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -184,12 +185,21 @@ function AssignmentsPage() {
 
         await loadProducts();
         await loadAssignmentHistory(updatedProduct?._id || targetId);
+        if (newAssignment?._id) {
+          openAssignmentActPdf({
+            product: updatedProduct || selectedProduct,
+            assignment: newAssignment,
+            issuerName: user?.name,
+          }).catch(() => {
+            window.alert('El acta no pudo abrirse automáticamente, intenta nuevamente.');
+          });
+        }
         window.alert('Producto asignado correctamente.');
       } finally {
         setAssignmentProcessing(false);
       }
     },
-    [request, selectedProductId, loadProducts, loadAssignmentHistory]
+    [request, selectedProductId, loadProducts, loadAssignmentHistory, selectedProduct, user?.name]
   );
 
   const handleUnassignProduct = useCallback(
