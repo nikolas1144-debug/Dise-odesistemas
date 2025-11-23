@@ -10,6 +10,8 @@ function DispatchGuidesPage() {
   const [loadingGuides, setLoadingGuides] = useState(false);
   const [uploadingGuide, setUploadingGuide] = useState(false);
   const [error, setError] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [actionError, setActionError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   const canManage = hasRole('ADMIN', 'MANAGER');
@@ -17,6 +19,8 @@ function DispatchGuidesPage() {
   const loadGuides = useCallback(async () => {
     setLoadingGuides(true);
     setError('');
+    setFeedback('');
+    setActionError('');
     try {
       const data = await request('/dispatch-guides');
       setGuides(data);
@@ -38,13 +42,15 @@ function DispatchGuidesPage() {
     async (formData) => {
       setUploadingGuide(true);
       setError('');
+      setFeedback('');
+      setActionError('');
       try {
         await request('/dispatch-guides', {
           method: 'POST',
           formData,
         });
         await loadGuides();
-        window.alert('Guía de despacho ingresada correctamente.');
+        setFeedback('Guía de despacho ingresada correctamente.');
       } finally {
         setUploadingGuide(false);
       }
@@ -55,6 +61,7 @@ function DispatchGuidesPage() {
   const handleDownloadGuide = useCallback(
     async (guide) => {
       try {
+        setActionError('');
         const response = await fetch(`${getApiUrl()}/dispatch-guides/${guide._id}/download`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -75,7 +82,7 @@ function DispatchGuidesPage() {
         link.remove();
         window.URL.revokeObjectURL(url);
       } catch (downloadError) {
-        alert(downloadError.message || 'No se pudo descargar la guía de despacho.');
+        setActionError(downloadError.message || 'No se pudo descargar la guía de despacho.');
       }
     },
     [token]
@@ -90,10 +97,11 @@ function DispatchGuidesPage() {
         return;
       }
       try {
+        setActionError('');
         await request(`/dispatch-guides/${guide._id}`, { method: 'DELETE' });
         await loadGuides();
       } catch (deleteError) {
-        alert(deleteError.message || 'No se pudo eliminar la guía de despacho.');
+        setActionError(deleteError.message || 'No se pudo eliminar la guía de despacho.');
       }
     },
     [request, loadGuides]
@@ -150,6 +158,18 @@ function DispatchGuidesPage() {
       {error && (
         <div className="card">
           <strong>Error:</strong> {error}
+        </div>
+      )}
+
+      {actionError && (
+        <div className="card">
+          <strong>Alerta:</strong> {actionError}
+        </div>
+      )}
+
+      {feedback && (
+        <div className="card">
+          <strong>Listo:</strong> {feedback}
         </div>
       )}
 

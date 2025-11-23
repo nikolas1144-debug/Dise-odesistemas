@@ -12,6 +12,7 @@ function ProductEntryPage() {
   const [loadingModels, setLoadingModels] = useState(false);
   const [modelsError, setModelsError] = useState('');
   const [creatingProduct, setCreatingProduct] = useState(false);
+  const [feedback, setFeedback] = useState('');
 
   const canManage = hasRole('ADMIN', 'MANAGER');
 
@@ -53,6 +54,7 @@ function ProductEntryPage() {
   const handleCreateProduct = useCallback(
     async (payload) => {
       setCreatingProduct(true);
+      setFeedback('');
       try {
         if (payload.isSerialized === false) {
           const bulkPayload = {
@@ -76,7 +78,7 @@ function ProductEntryPage() {
             data: bulkPayload,
           });
 
-          window.alert(
+          setFeedback(
             payload.quantity === 1
               ? 'Se registró 1 unidad sin número de serie.'
               : `Se registraron ${payload.quantity} unidades sin número de serie.`
@@ -130,7 +132,7 @@ function ProductEntryPage() {
           });
         }
 
-        window.alert(
+        setFeedback(
           serialCount === 1
             ? 'Producto registrado correctamente.'
             : `Se registraron ${serialCount} productos correctamente.`
@@ -195,6 +197,12 @@ function ProductEntryPage() {
       {modelsError && (
         <div className="card">
           <strong>Error:</strong> {modelsError}
+        </div>
+      )}
+
+      {feedback && (
+        <div className="card">
+          <strong>Listo:</strong> {feedback}
         </div>
       )}
 
