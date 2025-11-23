@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const fs = require('fs');
 
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -32,6 +33,20 @@ app.use('/api/dispatch-guides', dispatchGuideRoutes);
 app.use('/api/external-decommission-acts', externalDecommissionActRoutes);
 app.use('/api/ad', activeDirectoryRoutes);
 app.use('/api/users', userRoutes);
+
+const frontendDistPath = path.join(__dirname, '..', '..', 'frontend', 'dist');
+const shouldServeFrontend = process.env.NODE_ENV === 'production' && fs.existsSync(frontendDistPath);
+
+if (shouldServeFrontend) {
+  app.use(express.static(frontendDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
 
 app.use((err, req, res, next) => {
   console.error(err);
