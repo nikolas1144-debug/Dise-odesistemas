@@ -100,7 +100,7 @@ function ProductCatalogPage() {
       });
       setFormValues(initialFormState);
       await loadModels();
-      window.alert('Categoría creada correctamente.');
+      setActionMessage('Categoría creada correctamente.');
     } catch (err) {
       setFormError(err.message || 'No se pudo registrar el modelo.');
     } finally {

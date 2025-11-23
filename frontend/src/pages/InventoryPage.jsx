@@ -39,6 +39,8 @@ function InventoryPage() {
   const [productModels, setProductModels] = useState([]);
   const [loadingModels, setLoadingModels] = useState(false);
   const [modelsError, setModelsError] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [actionError, setActionError] = useState('');
 
   const canManage = hasRole('ADMIN', 'MANAGER');
 
@@ -185,7 +187,7 @@ function InventoryPage() {
           data: payload,
         });
         await loadProducts();
-        window.alert('Producto actualizado correctamente.');
+        setFeedback('Producto actualizado correctamente.');
         setEditing(false);
       } catch (err) {
         throw err;
@@ -202,7 +204,7 @@ function InventoryPage() {
     }
 
     if (selectedProduct.status === 'ASSIGNED') {
-      alert('Debes liberar la asignación antes de eliminar el producto.');
+      setActionError('Debes liberar la asignación antes de eliminar el producto.');
       return;
     }
 
@@ -216,10 +218,11 @@ function InventoryPage() {
 
     setDeleting(true);
     try {
+      setActionError('');
       await request(`/products/${selectedProduct._id}`, { method: 'DELETE' });
       await loadProducts();
     } catch (err) {
-      alert(err.message || 'No se pudo eliminar el producto.');
+      setActionError(err.message || 'No se pudo eliminar el producto.');
     } finally {
       setDeleting(false);
     }
@@ -261,6 +264,18 @@ function InventoryPage() {
       {error && (
         <div className="card">
           <strong>Error:</strong> {error}
+        </div>
+      )}
+
+      {actionError && (
+        <div className="card">
+          <strong>Alerta:</strong> {actionError}
+        </div>
+      )}
+
+      {feedback && (
+        <div className="card">
+          <strong>Listo:</strong> {feedback}
         </div>
       )}
 

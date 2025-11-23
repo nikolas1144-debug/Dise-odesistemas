@@ -15,6 +15,8 @@ function AssignmentsPage() {
   const [assignmentHistory, setAssignmentHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [assignmentProcessing, setAssignmentProcessing] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const [actionError, setActionError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   const canManage = hasRole('ADMIN', 'MANAGER');
@@ -107,11 +109,12 @@ function AssignmentsPage() {
 
   const handleDownloadHistory = useCallback(async () => {
     if (!selectedProductId) {
-      window.alert('Selecciona un producto para descargar su historial.');
+      setActionError('Selecciona un producto para descargar su historial.');
       return;
     }
 
     try {
+      setActionError('');
       const blob = await request(`/products/${selectedProductId}/assignments/pdf`, {
         responseType: 'blob',
       });
@@ -141,7 +144,7 @@ function AssignmentsPage() {
       }, 1000);
     } catch (error) {
       console.error('No se pudo descargar el historial en PDF.', error);
-      window.alert('No se pudo descargar el historial en PDF. Inténtalo nuevamente más tarde.');
+      setActionError('No se pudo descargar el historial en PDF. Inténtalo nuevamente más tarde.');
     }
   }, [request, selectedProductId, selectedProduct]);
 
@@ -152,6 +155,8 @@ function AssignmentsPage() {
       }
       const targetId = selectedProductId;
       setAssignmentProcessing(true);
+      setFeedback('');
+      setActionError('');
       try {
         const response = await request(`/products/${targetId}/assign`, {
           method: 'POST',
@@ -191,10 +196,10 @@ function AssignmentsPage() {
             assignment: newAssignment,
             issuerName: user?.name,
           }).catch(() => {
-            window.alert('El acta no pudo abrirse automáticamente, intenta nuevamente.');
+            setActionError('El acta no pudo abrirse automáticamente, intenta nuevamente.');
           });
         }
-        window.alert('Producto asignado correctamente.');
+        setFeedback('Producto asignado correctamente.');
       } finally {
         setAssignmentProcessing(false);
       }
@@ -209,6 +214,8 @@ function AssignmentsPage() {
       }
       const targetId = selectedProductId;
       setAssignmentProcessing(true);
+      setFeedback('');
+      setActionError('');
       try {
         const response = await request(`/products/${targetId}/unassign`, {
           method: 'POST',
@@ -242,7 +249,7 @@ function AssignmentsPage() {
 
         await loadProducts();
         await loadAssignmentHistory(updatedProduct?._id || targetId);
-        window.alert('Producto liberado correctamente.');
+        setFeedback('Producto liberado correctamente.');
       } finally {
         setAssignmentProcessing(false);
       }
@@ -294,6 +301,18 @@ function AssignmentsPage() {
       {productsError && (
         <div className="card">
           <strong>Error:</strong> {productsError}
+        </div>
+      )}
+
+      {actionError && (
+        <div className="card">
+          <strong>Alerta:</strong> {actionError}
+        </div>
+      )}
+
+      {feedback && (
+        <div className="card">
+          <strong>Listo:</strong> {feedback}
         </div>
       )}
 

@@ -10,6 +10,8 @@ function ExternalDecommissionActsPage() {
   const [loadingActs, setLoadingActs] = useState(false);
   const [uploadingAct, setUploadingAct] = useState(false);
   const [error, setError] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [actionError, setActionError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   const canManage = hasRole('ADMIN', 'MANAGER');
@@ -17,6 +19,8 @@ function ExternalDecommissionActsPage() {
   const loadActs = useCallback(async () => {
     setLoadingActs(true);
     setError('');
+    setFeedback('');
+    setActionError('');
     try {
       const data = await request('/external-decommission-acts');
       setActs(data);
@@ -38,13 +42,15 @@ function ExternalDecommissionActsPage() {
     async (formData) => {
       setUploadingAct(true);
       setError('');
+      setFeedback('');
+      setActionError('');
       try {
         await request('/external-decommission-acts', {
           method: 'POST',
           formData,
         });
         await loadActs();
-        window.alert('Acta registrada correctamente.');
+        setFeedback('Acta registrada correctamente.');
       } catch (uploadError) {
         setError(uploadError.message || 'No se pudo registrar el acta de baja externa.');
         throw uploadError;
@@ -58,6 +64,7 @@ function ExternalDecommissionActsPage() {
   const handleDownloadAct = useCallback(
     async (act) => {
       try {
+        setActionError('');
         const response = await fetch(
           `${getApiUrl()}/external-decommission-acts/${act._id}/download`,
           {
@@ -81,7 +88,7 @@ function ExternalDecommissionActsPage() {
         link.remove();
         window.URL.revokeObjectURL(url);
       } catch (downloadError) {
-        alert(downloadError.message || 'No se pudo descargar el acta de baja externa.');
+        setActionError(downloadError.message || 'No se pudo descargar el acta de baja externa.');
       }
     },
     [token]
@@ -138,6 +145,18 @@ function ExternalDecommissionActsPage() {
       {error && (
         <div className="card">
           <strong>Error:</strong> {error}
+        </div>
+      )}
+
+      {actionError && (
+        <div className="card">
+          <strong>Alerta:</strong> {actionError}
+        </div>
+      )}
+
+      {feedback && (
+        <div className="card">
+          <strong>Listo:</strong> {feedback}
         </div>
       )}
 
